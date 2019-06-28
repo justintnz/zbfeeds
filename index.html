@@ -1,0 +1,62 @@
+
+
+  <audio id="audio" preload="none" tabindex="0" controls>
+	</audio>
+  <br/>
+  <div id="desc">&nbsp;</div>
+
+  <br/>
+<button type="button" name="button" onclick="play_next();">Next</button>
+<script>
+  var data;
+  let counter = 0;
+  fetch('zb-news-stream-feeds.json')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    console.log(JSON.stringify(myJson));
+    data = myJson;
+    player = document.querySelector("audio");
+    desc = document.getElementById("desc");
+    var counter = 1;
+    data.forEach(function(d){
+      var s = document.createElement("source");
+      s.setAttribute('src',d["streamUrl"]);
+      s.setAttribute('data-track-number',counter);
+      s.setAttribute('title',d['titleText']);
+      s.setAttribute('mainText',d['mainText']);
+      s.setAttribute('updateDate',d['updateDate']);
+
+      player.appendChild(s);
+      counter++;
+      });
+      play_init();
+
+      player.addEventListener("ended",function(){
+        play_next();
+      });
+  });
+
+function play_init()
+  {
+    counter=0;
+
+    desc.innerHTML = player.children[counter].title + ' at '+player.children[counter].getAttribute('updateDate');
+    if (player.children[counter].getAttribute('mainText')!=player.children[counter].title)
+      desc.innerHTML += '<p>'+ player.children[counter].getAttribute('mainText') +'</p>';
+    player.play();
+
+  }
+function play_next()
+{
+  counter++;
+  if (counter>=player.childElementCount) counter = 0;
+  desc.innerHTML = player.children[counter].title + ' at '+player.children[counter].getAttribute('updateDate');
+  if (player.children[counter].getAttribute('mainText')!=player.children[counter].title)
+    desc.innerHTML += '<p>'+ player.children[counter].getAttribute('mainText') +'</p>';
+  player.setAttribute('src', player.children[counter].src);
+  player.play();
+
+}
+  </script>

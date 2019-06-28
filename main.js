@@ -18,12 +18,14 @@ async function main() {
         url: theUrl
       })
       .then(function(response) {
-        data = utf8.encode(response.data);
+        //data = utf8.encode(response.data);
+        data = response.data;
         parseString(data, function(err, result) {
           fds = xmlToFeed(result.rss.channel[0].item);
           feeds = feeds.concat(fds);
           counter++;
-          if (counter==showlist.length) {
+          if (counter>=showlist.length) {
+
               processFeeds(headline.data,feeds);
           }
         });
@@ -35,8 +37,8 @@ async function main() {
 }
 
 function processFeeds(headline,feeds) {
-  //console.log(feeds);
-  feeds = headline.concat(feeds);
+  feeds1 = feeds.sort(function(a, b){return a['updateDate'] < b['updateDate'] });
+  feeds = headline.concat(feeds1);
   jsonFeeds = JSON.stringify(feeds);
   const fs = require('fs');
   fs.writeFile("zb-news-stream-feeds.json", jsonFeeds, function(err) {
